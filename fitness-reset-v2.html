@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Reset — 102 to 92</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0c1a18; --panel:#12241f; --panel2:#183028; --line:rgba(233,245,241,0.10);
+    --ink:#e9f5f1; --ink-dim:#8fada4; --lime:#c6f135; --amber:#ff9e40; --coral:#ff6b6b; --teal:#5fd3c4;
+    --radius:18px;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:radial-gradient(circle at 15% -10%, #163a30 0%, transparent 45%),
+      radial-gradient(circle at 100% 0%, #1c2f2a 0%, transparent 40%), var(--bg);
+    color:var(--ink); font-family:'Space Grotesk',sans-serif; min-height:100vh; padding-bottom:50px;
+    -webkit-text-size-adjust:100%;
+  }
+  .mono{font-family:'JetBrains Mono',monospace;}
+  .wrap{max-width:760px;margin:0 auto;padding:18px 16px 0;}
+  #banner{display:none;background:#3a2a12;color:var(--amber);font-size:12px;text-align:center;padding:8px 14px;}
+
+  .hero{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:22px;padding:22px 18px 18px;position:relative;overflow:hidden;}
+  .hero-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
+  .hero-label{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-dim);}
+  .hero-date{font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--lime);margin-top:4px;}
+  .streak-pill{background:rgba(198,241,53,0.1);border:1px solid rgba(198,241,53,0.35);color:var(--lime);font-family:'JetBrains Mono',monospace;font-size:12px;padding:6px 11px;border-radius:100px;white-space:nowrap;flex:none;}
+
+  .ring-row{display:flex;align-items:center;gap:18px;margin-top:16px;flex-wrap:wrap;}
+  .ring-box{position:relative;width:128px;height:128px;flex:none;}
+  .ring-box svg{transform:rotate(-90deg);width:100%;height:100%;}
+  .ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+  .ring-pct{font-family:'JetBrains Mono',monospace;font-size:23px;font-weight:700;color:var(--lime);}
+  .ring-sub{font-size:10px;color:var(--ink-dim);letter-spacing:.08em;text-transform:uppercase;margin-top:2px;}
+
+  .stat-cols{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;flex:1;min-width:180px;}
+  .stat{background:rgba(0,0,0,0.18);border:1px solid var(--line);border-radius:12px;padding:9px 8px;}
+  .stat-num{font-family:'JetBrains Mono',monospace;font-size:17px;font-weight:700;}
+  .stat-num.lime{color:var(--lime);} .stat-num.amber{color:var(--amber);}
+  .stat-lbl{font-size:9.5px;color:var(--ink-dim);text-transform:uppercase;letter-spacing:.06em;margin-top:3px;}
+
+  .tabs{display:flex;gap:6px;margin:18px 0 14px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+  .tabs::-webkit-scrollbar{display:none;}
+  .tab-btn{flex:none;background:var(--panel);border:1px solid var(--line);color:var(--ink-dim);font-family:'Space Grotesk';font-size:12.5px;font-weight:600;padding:9px 14px;border-radius:100px;cursor:pointer;white-space:nowrap;}
+  .tab-btn.active{background:var(--lime);color:#0c1a18;border-color:var(--lime);}
+
+  .panel{display:none;} .panel.active{display:block;animation:fade .2s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:12px;}
+  .card h3{margin:0 0 4px;font-size:15px;} .card p.sub{margin:0 0 12px;color:var(--ink-dim);font-size:12px;line-height:1.55;}
+
+  .check-item{display:flex;align-items:center;gap:12px;padding:11px 2px;border-bottom:1px solid var(--line);}
+  .check-item:last-child{border-bottom:none;}
+  .check-item input{width:21px;height:21px;accent-color:var(--lime);flex:none;cursor:pointer;}
+  .check-item label{flex:1;font-size:13.5px;cursor:pointer;}
+  .check-item label b{display:block;font-size:11.5px;color:var(--ink-dim);font-weight:400;margin-top:2px;}
+  .check-item.done label{color:var(--ink-dim);text-decoration:line-through;}
+
+  .ex-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  @media(max-width:480px){.ex-grid{grid-template-columns:1fr;}}
+  .ex-card{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:12px;text-align:center;}
+  .ex-card svg{width:96px;height:112px;}
+  .ex-card h4{margin:4px 0 2px;font-size:13px;}
+  .ex-card span{font-size:11px;color:var(--ink-dim);display:block;line-height:1.4;}
+  .ex-card .dur{color:var(--amber);font-family:'JetBrains Mono';font-size:10.5px;margin-top:4px;display:block;}
+
+  table.walk{width:100%;border-collapse:collapse;font-size:12px;}
+  table.walk th,table.walk td{padding:7px 5px;text-align:left;border-bottom:1px solid var(--line);}
+  table.walk th{color:var(--ink-dim);font-weight:600;font-size:10.5px;text-transform:uppercase;}
+  table.walk td.mono{color:var(--lime);}
+
+  .swap-row{display:grid;grid-template-columns:1fr 20px 1fr;align-items:center;gap:6px;padding:11px 2px;border-bottom:1px solid var(--line);}
+  .swap-row:last-child{border-bottom:none;}
+  .swap-old{color:var(--ink-dim);font-size:12.5px;} .swap-new{color:var(--lime);font-size:12.5px;font-weight:600;}
+  .arrow{color:var(--amber);text-align:center;}
+  .tag-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
+  .tag{background:rgba(255,158,64,0.1);border:1px solid rgba(255,158,64,0.3);color:var(--amber);font-size:11px;padding:5px 10px;border-radius:100px;}
+  .tag.teal{background:rgba(95,211,196,0.1);border-color:rgba(95,211,196,0.3);color:var(--teal);}
+
+  .plate-wrap{display:flex;gap:16px;align-items:center;flex-wrap:wrap;}
+  .plate-legend div{font-size:12px;margin-bottom:6px;display:flex;align-items:center;gap:8px;}
+  .dot{width:10px;height:10px;border-radius:3px;flex:none;}
+
+  .water-hero{display:flex;flex-direction:column;align-items:center;padding:8px 0 2px;}
+  .glass-row{display:flex;gap:7px;justify-content:center;flex-wrap:wrap;margin:14px 0;}
+  .glass{width:30px;height:40px;cursor:pointer;}
+  .water-count{font-family:'JetBrains Mono';font-size:32px;color:var(--lime);font-weight:700;}
+  .water-goal-lbl{font-size:11.5px;color:var(--ink-dim);margin-top:2px;}
+  .water-btns{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;justify-content:center;}
+  .btn{background:var(--lime);color:#0c1a18;border:none;font-family:'Space Grotesk';font-weight:700;font-size:13px;padding:11px 18px;border-radius:100px;cursor:pointer;}
+  .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--ink);}
+  .btn.small{padding:8px 14px;font-size:12px;}
+  .btn.amber{background:var(--amber);}
+  .btn.teal{background:var(--teal);}
+
+  .field-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;}
+  .field-row input, .field-row select{background:rgba(0,0,0,0.25);border:1px solid var(--line);color:var(--ink);border-radius:10px;padding:10px 11px;font-family:'JetBrains Mono';font-size:13px;flex:1;min-width:90px;}
+  .bf-result{margin-top:10px;padding:12px;background:rgba(0,0,0,0.2);border-radius:12px;font-size:13px;display:none;}
+  .bf-result b{color:var(--lime);font-family:'JetBrains Mono';font-size:20px;}
+
+  .log-list{max-height:170px;overflow-y:auto;margin-top:10px;}
+  .log-row{display:flex;justify-content:space-between;font-size:12px;padding:8px 2px;border-bottom:1px solid var(--line);color:var(--ink-dim);}
+  .log-row b{color:var(--ink);font-family:'JetBrains Mono';}
+  .export-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;}
+  #importFile{display:none;}
+  .photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:8px;margin-top:14px;}
+  .photo-thumb{position:relative;border-radius:10px;overflow:hidden;background:var(--panel2);}
+  .photo-thumb img{width:100%;height:90px;object-fit:cover;display:block;}
+  .photo-thumb .pdate{font-size:8.5px;color:var(--ink-dim);text-align:center;padding:3px 0;}
+  .photo-thumb .ptype{position:absolute;top:2px;left:2px;background:rgba(0,0,0,0.55);color:var(--lime);font-size:8px;padding:1px 5px;border-radius:100px;text-transform:uppercase;letter-spacing:.04em;}
+  .photo-thumb .pdel{position:absolute;top:2px;right:2px;background:rgba(0,0,0,0.6);color:#fff;border:none;border-radius:50%;width:18px;height:18px;font-size:11px;cursor:pointer;line-height:1;}
+  .compare-row{display:flex;gap:10px;margin-top:4px;}
+  .compare-col{flex:1;text-align:center;}
+  .compare-col img{width:100%;border-radius:12px;max-height:220px;object-fit:cover;}
+  .compare-col span{font-size:11px;color:var(--ink-dim);display:block;margin-top:4px;}
+
+  .sos-btn{width:100%;background:linear-gradient(180deg,#ff7a5c,var(--coral));border:none;color:#2b0e0e;font-family:'Space Grotesk';font-weight:700;font-size:15px;padding:16px;border-radius:16px;cursor:pointer;}
+  .sos-steps{margin-top:14px;} .sos-step{display:flex;gap:12px;padding:9px 2px;border-bottom:1px solid var(--line);}
+  .sos-step:last-child{border-bottom:none;} .sos-num{font-family:'JetBrains Mono';color:var(--coral);font-weight:700;flex:none;width:20px;}
+
+  .warn{background:rgba(255,107,107,0.08);border:1px solid rgba(255,107,107,0.3);border-radius:12px;padding:11px 13px;font-size:12px;color:#ffb3b3;margin-bottom:12px;line-height:1.5;}
+  .foot-note{font-size:11px;color:var(--ink-dim);line-height:1.6;margin-top:22px;padding:14px 4px;border-top:1px solid var(--line);}
+</style>
+</head>
+<body>
+<div id="banner">Local storage isn't available in this browser (e.g. private mode) — export your data often as CSV.</div>
+<div id="backupBanner" style="display:none;background:#123a2f;color:var(--lime);font-size:12px;text-align:center;padding:8px 14px;">It's been a while since you exported a backup — open Progress → Export CSV when you get a moment.</div>
+<div class="wrap">
+
+  <div class="hero">
+    <div class="hero-top">
+      <div><div class="hero-label">Daily Reset</div><div class="hero-date mono" id="todayLabel">—</div></div>
+      <div class="streak-pill mono" id="streakPill">🔥 0 day streak</div>
+    </div>
+    <div class="ring-row">
+      <div class="ring-box">
+        <svg viewBox="0 0 150 150">
+          <circle cx="75" cy="75" r="64" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="12"/>
+          <circle id="ringFg" cx="75" cy="75" r="64" fill="none" stroke="#c6f135" stroke-width="12" stroke-linecap="round" stroke-dasharray="402" stroke-dashoffset="402"/>
+        </svg>
+        <div class="ring-center"><div class="ring-pct" id="ringPct">0%</div><div class="ring-sub">today</div></div>
+      </div>
+      <div class="stat-cols">
+        <div class="stat"><div class="stat-num lime" id="statCurrent">102.0</div><div class="stat-lbl">Current kg</div></div>
+        <div class="stat"><div class="stat-num amber" id="statToGo">10.0</div><div class="stat-lbl">To go</div></div>
+        <div class="stat"><div class="stat-num" id="statGoal">92.0</div><div class="stat-lbl">Goal kg</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="today">Today</button>
+    <button class="tab-btn" data-tab="move">Move</button>
+    <button class="tab-btn" data-tab="strength">Strength</button>
+    <button class="tab-btn" data-tab="back">Back Care</button>
+    <button class="tab-btn" data-tab="eat">Eat</button>
+    <button class="tab-btn" data-tab="water">Water</button>
+    <button class="tab-btn" data-tab="progress">Progress</button>
+    <button class="tab-btn" data-tab="sos">Cramp SOS</button>
+  </div>
+
+  <!-- TODAY -->
+  <div class="panel active" id="panel-today">
+    <div class="card">
+      <h3>Today's routine</h3>
+      <p class="sub">Tick these off as you go — they fill the ring above. Consistency beats intensity.</p>
+      <div id="checklist"></div>
+    </div>
+    <div class="card">
+      <h3>On the 3-month, 10kg target</h3>
+      <p class="sub">That's ~800g/week — doable but on the ambitious side. If it feels like too much pressure, 6–7kg over 3 months is still excellent and easier to hold onto for good. Given the cramps and heart rate climbing fast on a jog, get a basic checkup (BP, sugar, resting HR) before pushing intensity — it makes everything below safer.</p>
+    </div>
+  </div>
+
+  <!-- MOVE -->
+  <div class="panel" id="panel-move">
+    <div class="card">
+      <h3>Cramp-safe starter routine — 15–20 min</h3>
+      <p class="sub">4–5 days a week. Always 3–4 min slow warm-up before, 3–4 min stretch after — that alone prevents most cramps.</p>
+      <div class="ex-grid">
+        <div class="ex-card">
+          <img src="images/march-in-place.jpg" alt="March in place" loading="lazy" style="width:96px;height:112px;object-fit:cover;border-radius:10px;display:block;margin:0 auto;" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-block';"><svg viewBox="0 0 100 120" style="display:none;"><line x1="10" y1="110" x2="90" y2="110" stroke="rgba(255,255,255,.15)" stroke-width="2"/>
+            <g stroke="#c6f135" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="50" cy="14" r="7" fill="#c6f135" stroke="none"/>
+              <line x1="50" y1="21" x2="50" y2="58"/>
+              <line x1="40" y1="27" x2="30" y2="20"/><line x1="30" y1="20" x2="22" y2="28"/>
+              <line x1="60" y1="27" x2="68" y2="38"/><line x1="68" y1="38" x2="72" y2="50"/>
+              <line x1="43" y1="58" x2="43" y2="84"/><line x1="43" y1="84" x2="43" y2="108"/>
+              <line x1="57" y1="58" x2="65" y2="48"/><line x1="65" y1="48" x2="65" y2="68"/>
+            </g></svg>
+          <h4>March in place</h4><span>Lift knees, swing opposite arm each step</span><span class="dur mono">3–4 min · warm-up</span>
+        </div>
+        <div class="ex-card">
+          <img src="images/wall-pushups.jpg" alt="Wall push-ups" loading="lazy" style="width:96px;height:112px;object-fit:cover;border-radius:10px;display:block;margin:0 auto;" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-block';"><svg viewBox="0 0 100 120" style="display:none;"><line x1="10" y1="112" x2="90" y2="112" stroke="rgba(255,255,255,.15)" stroke-width="2"/>
+            <line x1="88" y1="10" x2="88" y2="112" stroke="#8fada4" stroke-width="3"/>
+            <g stroke="#c6f135" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="66" cy="22" r="7" fill="#c6f135" stroke="none"/>
+              <line x1="62" y1="28" x2="58" y2="32"/><line x1="58" y1="32" x2="46" y2="58"/>
+              <line x1="58" y1="32" x2="72" y2="26"/><line x1="72" y1="26" x2="86" y2="22"/>
+              <line x1="46" y1="58" x2="44" y2="84"/><line x1="44" y1="84" x2="42" y2="110"/>
+            </g></svg>
+          <h4>Wall push-ups</h4><span>Hands on wall, shoulder width, lower & press</span><span class="dur mono">10 reps × 2</span>
+        </div>
+        <div class="ex-card">
+          <img src="images/sit-to-stand-squat.jpg" alt="Sit to stand squat" loading="lazy" style="width:96px;height:112px;object-fit:cover;border-radius:10px;display:block;margin:0 auto;" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-block';"><svg viewBox="0 0 100 120" style="display:none;"><line x1="10" y1="110" x2="90" y2="110" stroke="rgba(255,255,255,.15)" stroke-width="2"/>
+            <rect x="58" y="76" width="26" height="6" fill="none" stroke="#8fada4" stroke-width="2"/>
+            <line x1="60" y1="82" x2="60" y2="108" stroke="#8fada4" stroke-width="2"/><line x1="82" y1="82" x2="82" y2="108" stroke="#8fada4" stroke-width="2"/>
+            <g stroke="#c6f135" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="47" cy="38" r="7" fill="#c6f135" stroke="none"/>
+              <line x1="50" y1="45" x2="58" y2="72"/>
+              <line x1="50" y1="45" x2="36" y2="52"/><line x1="36" y1="52" x2="26" y2="56"/>
+              <line x1="58" y1="72" x2="52" y2="90"/><line x1="52" y1="90" x2="50" y2="108"/>
+            </g></svg>
+          <h4>Sit-to-stand squat</h4><span>Sturdy chair. Sit slow, stand without hands if you can</span><span class="dur mono">10 reps × 2</span>
+        </div>
+        <div class="ex-card">
+          <img src="images/side-leg-raise.jpg" alt="Standing side leg raise" loading="lazy" style="width:96px;height:112px;object-fit:cover;border-radius:10px;display:block;margin:0 auto;" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-block';"><svg viewBox="0 0 100 120" style="display:none;"><line x1="10" y1="110" x2="90" y2="110" stroke="rgba(255,255,255,.15)" stroke-width="2"/>
+            <line x1="18" y1="30" x2="18" y2="95" stroke="#8fada4" stroke-width="3"/>
+            <g stroke="#c6f135" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="46" cy="20" r="7" fill="#c6f135" stroke="none"/>
+              <line x1="46" y1="27" x2="46" y2="58"/>
+              <line x1="38" y1="33" x2="22" y2="50"/>
+              <line x1="54" y1="33" x2="64" y2="30"/><line x1="64" y1="30" x2="74" y2="26"/>
+              <line x1="40" y1="58" x2="40" y2="84"/><line x1="40" y1="84" x2="40" y2="108"/>
+              <line x1="52" y1="58" x2="68" y2="62"/><line x1="68" y1="62" x2="84" y2="58"/>
+            </g></svg>
+          <h4>Standing side leg raise</h4><span>Hold a chair, lift leg to the side, control the return</span><span class="dur mono">10 each side × 2</span>
+        </div>
+        <div class="ex-card">
+          <img src="images/calf-raises.jpg" alt="Calf raises" loading="lazy" style="width:96px;height:112px;object-fit:cover;border-radius:10px;display:block;margin:0 auto;" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-block';"><svg viewBox="0 0 100 120" style="display:none;"><line x1="10" y1="110" x2="90" y2="110" stroke="rgba(255,255,255,.15)" stroke-width="2"/>
+            <g stroke="#c6f135" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="50" cy="16" r="7" fill="#c6f135" stroke="none"/>
+              <line x1="50" y1="23" x2="50" y2="58"/>
+              <line x1="40" y1="29" x2="34" y2="44"/><line x1="34" y1="44" x2="38" y2="54"/>
+              <line x1="60" y1="29" x2="66" y2="44"/><line x1="66" y1="44" x2="62" y2="54"/>
+              <line x1="44" y1="58" x2="44" y2="82"/><line x1="44" y1="82" x2="44" y2="104"/><line x1="44" y1="104" x2="40" y2="109"/>
+              <line x1="56" y1="58" x2="56" y2="82"/><line x1="56" y1="82" x2="56" y2="104"/><line x1="56" y1="104" x2="60" y2="109"/>
+            </g></svg>
+          <h4>Calf raises</h4><span>Hold a wall/chair, rise onto toes, lower slowly</span><span class="dur mono">15 reps × 2</span>
+        </div>
+        <div class="ex-card">
+          <img src="images/stretch-cooldown.jpg" alt="Stretch and cool down" loading="lazy" style="width:96px;height:112px;object-fit:cover;border-radius:10px;display:block;margin:0 auto;" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-block';"><svg viewBox="0 0 100 120" style="display:none;"><line x1="10" y1="110" x2="90" y2="110" stroke="rgba(255,255,255,.15)" stroke-width="2"/>
+            <g stroke="#ff9e40" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="45" y1="58" x2="45" y2="84"/><line x1="45" y1="84" x2="45" y2="108"/>
+              <line x1="55" y1="58" x2="55" y2="84"/><line x1="55" y1="84" x2="55" y2="108"/>
+              <path d="M50 58 Q50 72 50 80"/>
+              <circle cx="50" cy="92" r="7" fill="#ff9e40" stroke="none"/>
+              <line x1="50" y1="82" x2="48" y2="100"/>
+            </g></svg>
+          <h4>Stretch & cool down</h4><span>Forward fold, hold calves/hamstrings 20–30 sec</span><span class="dur mono">4–5 min · always last</span>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Walking progression (build up, don't jog yet)</h3>
+      <p class="sub">Your heart racing on a jog at 102kg is normal — impact is much higher than it'll be once you've built a base. Use the talk test: if you can't speak in short sentences while moving, slow down.</p>
+      <table class="walk">
+        <tr><th>Week</th><th>Session</th><th>Pace</th></tr>
+        <tr><td>1–2</td><td class="mono">10 min</td><td>Easy, flat ground</td></tr>
+        <tr><td>3–4</td><td class="mono">15 min</td><td>Easy → brisk</td></tr>
+        <tr><td>5–6</td><td class="mono">20 min</td><td>Brisk, talk-test pace</td></tr>
+        <tr><td>7–9</td><td class="mono">25–30 min</td><td>Brisk, slight incline ok</td></tr>
+        <tr><td>10–12</td><td class="mono">35–40 min</td><td>Brisk / short jog intervals only if HR stays controlled</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- STRENGTH -->
+  <div class="panel" id="panel-strength">
+    <div class="card">
+      <h3>Dumbbell strength — legs & back</h3>
+      <p class="sub">2–3 days a week, not back-to-back days. Pick a weight where the last 2 reps of each set feel hard but your form stays clean. 2 sets to start, add a 3rd after 2 weeks.</p>
+      <div class="ex-grid">
+        <div class="ex-card">
+          <img src="images/goblet-squat.jpg" alt="Dumbbell goblet squat" loading="lazy" style="width:96px;height:112px;object-fit:cover;border-radius:10px;display:block;margin:0 auto;" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-block';"><svg viewBox="0 0 100 120" style="display:none;"><line x1="10" y1="110" x2="90" y2="110" stroke="rgba(255,255,255,.15)" stroke-width="2"/>
+            <g stroke="#ff9e40" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="50" cy="16" r="7" fill="#ff9e40" stroke="none"/>
+              <line x1="50" y1="23" x2="50" y2="66"/>
+              <line x1="42" y1="66" x2="38" y2="88"/><line x1="38" y1="88" x2="40" y2="108"/>
+              <line x1="58" y1="66" x2="62" y2="88"/><line x1="62" y1="88" x2="60" y2="108"/>
+              <line x1="40" y1="29" x2="47" y2="45"/><line x1="60" y1="29" x2="53" y2="45"/>
+            </g>
+            <rect x="44" y="43" width="12" height="5" fill="#ff9e40"/><circle cx="42" cy="45" r="4" fill="#ff9e40"/><circle cx="58" cy="45" r="4" fill="#ff9e40"/>
+          </svg>
+          <h4>Goblet squat</h4><span>Dumbbell at chest, sit hips back, chest up</span><span class="dur mono">10 reps × 2–3</span>
+        </div>
+        <div class="ex-card">
+          <img src="images/dumbbell-rdl.jpg" alt="Dumbbell Romanian deadlift" loading="lazy" style="width:96px;height:112px;object-fit:cover;border-radius:10px;display:block;margin:0 auto;" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-block';"><svg viewBox="0 0 100 120" style="display:none;"><line x1="10" y1="110" x2="90" y2="110" stroke="rgba(255,255,255,.15)" stroke-width="2"/>
+            <g stroke="#ff9e40" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="44" cy="26" r="7" fill="#ff9e40" stroke="none"/>
+              <line x1="47" y1="33" x2="50" y2="60"/>
+              <line x1="45" y1="60" x2="45" y2="84"/><line x1="45" y1="84" x2="45" y2="108"/>
+              <line x1="55" y1="60" x2="55" y2="84"/><line x1="55" y1="84" x2="55" y2="108"/>
+              <line x1="47" y1="35" x2="43" y2="70"/>
+            </g><rect x="38" y="68" width="10" height="5" fill="#ff9e40"/><circle cx="36" cy="70" r="4" fill="#ff9e40"/><circle cx="50" cy="70" r="4" fill="#ff9e40"/>
+          </svg>
+          <h4>Dumbbell RDL</h4><span>Flat back, hinge hips back, dumbbells slide down shins</span><span class="dur mono">10 reps × 2–3</span>
+        </div>
+        <div class="ex-card">
+          <img src="images/reverse-lunge.jpg" alt="Dumbbell reverse lunge" loading="lazy" style="width:96px;height:112px;object-fit:cover;border-radius:10px;display:block;margin:0 auto;" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-block';"><svg viewBox="0 0 100 120" style="display:none;"><line x1="10" y1="110" x2="90" y2="110" stroke="rgba(255,255,255,.15)" stroke-width="2"/>
+            <g stroke="#ff9e40" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="50" cy="16" r="7" fill="#ff9e40" stroke="none"/>
+              <line x1="50" y1="23" x2="50" y2="60"/>
+              <line x1="45" y1="60" x2="40" y2="82"/><line x1="40" y1="82" x2="40" y2="108"/>
+              <line x1="55" y1="60" x2="68" y2="92"/><line x1="68" y1="92" x2="74" y2="106"/>
+              <line x1="43" y1="37" x2="40" y2="58"/><line x1="57" y1="37" x2="60" y2="58"/>
+            </g><circle cx="39" cy="60" r="4" fill="#ff9e40"/><circle cx="61" cy="60" r="4" fill="#ff9e40"/>
+          </svg>
+          <h4>Reverse lunge</h4><span>Step back, back knee taps light, drive through front heel</span><span class="dur mono">8 each side × 2</span>
+        </div>
+        <div class="ex-card">
+          <img src="images/bent-over-row.jpg" alt="Dumbbell bent-over row" loading="lazy" style="width:96px;height:112px;object-fit:cover;border-radius:10px;display:block;margin:0 auto;" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-block';"><svg viewBox="0 0 100 120" style="display:none;"><line x1="10" y1="110" x2="90" y2="110" stroke="rgba(255,255,255,.15)" stroke-width="2"/>
+            <g stroke="#ff9e40" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="32" cy="34" r="7" fill="#ff9e40" stroke="none"/>
+              <line x1="38" y1="40" x2="50" y2="62"/>
+              <line x1="46" y1="62" x2="46" y2="86"/><line x1="46" y1="86" x2="46" y2="108"/>
+              <line x1="54" y1="62" x2="54" y2="86"/><line x1="54" y1="86" x2="54" y2="108"/>
+              <line x1="38" y1="40" x2="30" y2="52"/><line x1="30" y1="52" x2="26" y2="62"/>
+            </g><circle cx="24" cy="64" r="4" fill="#ff9e40"/>
+          </svg>
+          <h4>Bent-over row</h4><span>Hinge forward, pull dumbbell to ribs, squeeze back</span><span class="dur mono">10 each side × 2–3</span>
+        </div>
+        <div class="ex-card">
+          <img src="images/farmer-carry.jpg" alt="Dumbbell farmer carry" loading="lazy" style="width:96px;height:112px;object-fit:cover;border-radius:10px;display:block;margin:0 auto;" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-block';"><svg viewBox="0 0 100 120" style="display:none;"><line x1="10" y1="110" x2="90" y2="110" stroke="rgba(255,255,255,.15)" stroke-width="2"/>
+            <g stroke="#ff9e40" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="50" cy="14" r="7" fill="#ff9e40" stroke="none"/>
+              <line x1="50" y1="21" x2="50" y2="58"/>
+              <line x1="40" y1="27" x2="37" y2="62"/><line x1="60" y1="27" x2="63" y2="62"/>
+              <line x1="44" y1="58" x2="38" y2="80"/><line x1="38" y1="80" x2="34" y2="106"/>
+              <line x1="56" y1="58" x2="64" y2="82"/><line x1="64" y1="82" x2="70" y2="106"/>
+            </g><circle cx="36" cy="64" r="4" fill="#ff9e40"/><circle cx="64" cy="64" r="4" fill="#ff9e40"/>
+          </svg>
+          <h4>Farmer carry</h4><span>Dumbbells at sides, walk tall 20–30 steps, tight core</span><span class="dur mono">3 rounds</span>
+        </div>
+        <div class="ex-card">
+          <img src="images/weighted-calf-raise.jpg" alt="Weighted calf raise" loading="lazy" style="width:96px;height:112px;object-fit:cover;border-radius:10px;display:block;margin:0 auto;" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-block';"><svg viewBox="0 0 100 120" style="display:none;"><line x1="10" y1="110" x2="90" y2="110" stroke="rgba(255,255,255,.15)" stroke-width="2"/>
+            <g stroke="#ff9e40" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="50" cy="16" r="7" fill="#ff9e40" stroke="none"/>
+              <line x1="50" y1="23" x2="50" y2="58"/>
+              <line x1="40" y1="29" x2="38" y2="60"/><line x1="60" y1="29" x2="62" y2="60"/>
+              <line x1="44" y1="58" x2="44" y2="82"/><line x1="44" y1="82" x2="44" y2="104"/><line x1="44" y1="104" x2="40" y2="109"/>
+              <line x1="56" y1="58" x2="56" y2="82"/><line x1="56" y1="82" x2="56" y2="104"/><line x1="56" y1="104" x2="60" y2="109"/>
+            </g><circle cx="38" cy="62" r="4" fill="#ff9e40"/><circle cx="62" cy="62" r="4" fill="#ff9e40"/>
+          </svg>
+          <h4>Weighted calf raise</h4><span>Dumbbells at sides, rise onto toes, control the lower</span><span class="dur mono">15 reps × 2</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BACK CARE -->
+  <div class="panel" id="panel-back">
+    <div class="card">
+      <div class="warn">If pain radiates down a leg, causes numbness or tingling, or sharpens during any of these — stop and see a doctor or physio. These are for general stiffness, not a diagnosis.</div>
+      <h3>Daily back care — 10 min</h3>
+      <p class="sub">Best done every day, especially after long hours at your desk. Slow, controlled movement — never force a stretch.</p>
+      <div class="ex-grid">
+        <div class="ex-card">
+          <svg viewBox="0 0 100 120"><line x1="8" y1="100" x2="92" y2="100" stroke="rgba(255,255,255,.15)" stroke-width="2"/>
+            <g stroke="#5fd3c4" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="24" cy="55" r="6" fill="#5fd3c4" stroke="none"/>
+              <path d="M30 62 Q50 50 68 68"/>
+              <line x1="32" y1="65" x2="32" y2="90"/>
+              <line x1="68" y1="68" x2="70" y2="94"/>
+            </g>
+            <path d="M40 34 Q50 28 60 34" stroke="#5fd3c4" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <path d="M40 42 Q50 48 60 42" stroke="#5fd3c4" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.5"/>
+          </svg>
+          <h4>Cat-Cow</h4><span>On all fours, arch then round your spine slowly</span><span class="dur mono">10 slow reps</span>
+        </div>
+        <div class="ex-card">
+          <svg viewBox="0 0 100 120"><line x1="8" y1="100" x2="92" y2="100" stroke="rgba(255,255,255,.15)" stroke-width="2"/>
+            <g stroke="#5fd3c4" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="30" cy="55" r="6" fill="#5fd3c4" stroke="none"/>
+              <line x1="35" y1="60" x2="65" y2="63"/>
+              <line x1="35" y1="60" x2="35" y2="90"/>
+              <line x1="65" y1="63" x2="67" y2="90"/>
+              <line x1="30" y1="55" x2="14" y2="50"/>
+              <line x1="65" y1="63" x2="82" y2="60"/>
+            </g></svg>
+          <h4>Bird-dog</h4><span>Opposite arm & leg extend flat, hold, switch sides</span><span class="dur mono">8 each side</span>
+        </div>
+        <div class="ex-card">
+          <svg viewBox="0 0 100 120"><line x1="8" y1="95" x2="92" y2="95" stroke="rgba(255,255,255,.15)" stroke-width="2"/>
+            <g stroke="#5fd3c4" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="13" cy="83" r="6" fill="#5fd3c4" stroke="none"/>
+              <line x1="19" y1="86" x2="48" y2="74"/>
+              <line x1="48" y1="74" x2="66" y2="86"/>
+              <line x1="66" y1="86" x2="66" y2="95"/>
+              <line x1="19" y1="86" x2="10" y2="90"/>
+            </g></svg>
+          <h4>Glute bridge</h4><span>Lie back, knees bent, lift hips, squeeze glutes</span><span class="dur mono">12 reps × 2</span>
+        </div>
+        <div class="ex-card">
+          <svg viewBox="0 0 100 120"><line x1="8" y1="88" x2="92" y2="88" stroke="rgba(255,255,255,.15)" stroke-width="2"/>
+            <g stroke="#5fd3c4" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="9" cy="84" r="6" fill="#5fd3c4" stroke="none"/>
+              <line x1="15" y1="86" x2="45" y2="86"/>
+              <line x1="45" y1="86" x2="90" y2="86"/>
+              <line x1="45" y1="86" x2="37" y2="60"/><line x1="37" y1="60" x2="29" y2="50"/>
+              <line x1="15" y1="86" x2="34" y2="62"/>
+            </g></svg>
+          <h4>Knee-to-chest</h4><span>Lie back, pull one knee in, hold, other leg flat</span><span class="dur mono">20–30 sec each</span>
+        </div>
+        <div class="ex-card">
+          <svg viewBox="0 0 100 120"><line x1="10" y1="110" x2="90" y2="110" stroke="rgba(255,255,255,.15)" stroke-width="2"/>
+            <g stroke="#5fd3c4" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="50" cy="16" r="7" fill="#5fd3c4" stroke="none"/>
+              <line x1="50" y1="23" x2="50" y2="60"/>
+              <line x1="38" y1="27" x2="26" y2="34"/><line x1="26" y1="34" x2="30" y2="18"/>
+              <line x1="62" y1="27" x2="74" y2="34"/><line x1="74" y1="34" x2="70" y2="18"/>
+              <line x1="44" y1="60" x2="44" y2="86"/><line x1="44" y1="86" x2="44" y2="108"/>
+              <line x1="56" y1="60" x2="56" y2="86"/><line x1="56" y1="86" x2="56" y2="108"/>
+            </g></svg>
+          <h4>Wall angels</h4><span>Back to wall, slide arms from W to Y slowly</span><span class="dur mono">10 reps</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EAT -->
+  <div class="panel" id="panel-eat">
+    <div class="card">
+      <h3>Your plate, roughly</h3><p class="sub">No strict counting — get proportions right most meals, most days.</p>
+      <div class="plate-wrap">
+        <svg width="120" height="120" viewBox="0 0 100 100">
+          <circle cx="50" cy="50" r="46" fill="#1b3a34" stroke="var(--line)"/>
+          <path d="M50 50 L50 4 A46 46 0 0 1 89 68 Z" fill="#c6f135" opacity="0.85"/>
+          <path d="M50 50 L89 68 A46 46 0 0 1 26 93 Z" fill="#ff9e40" opacity="0.85"/>
+          <path d="M50 50 L26 93 A46 46 0 0 1 50 4 Z" fill="#3a5a52"/>
+        </svg>
+        <div class="plate-legend">
+          <div><span class="dot" style="background:#c6f135"></span> Half — vegetables & salad</div>
+          <div><span class="dot" style="background:#ff9e40"></span> Quarter — protein (dal, egg, paneer, Wed/Sun non-veg)</div>
+          <div><span class="dot" style="background:#3a5a52"></span> Quarter — rice/roti/carbs</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Swap, don't ban</h3><p class="sub">Bans backfire. These swaps keep you close to what you like, minus the daily damage.</p>
+      <div class="swap-row"><div class="swap-old">Office noodles / fried rice</div><div class="arrow">→</div><div class="swap-new">Less oil, side salad, veggies first</div></div>
+      <div class="swap-row"><div class="swap-old">Evening egg puff / cake</div><div class="arrow">→</div><div class="swap-new">Roasted chana, fruit, or boiled egg</div></div>
+      <div class="swap-row"><div class="swap-old">Pizza / donut / coke</div><div class="arrow">→</div><div class="swap-new">Once-a-week treat, not default</div></div>
+      <div class="swap-row"><div class="swap-old">Tea/coffee when lazy or cold</div><div class="arrow">→</div><div class="swap-new">Warm lemon water, or ginger tea, no sugar</div></div>
+      <div class="swap-row"><div class="swap-old">Biryani, non-veg (Wed/Sun)</div><div class="arrow">→</div><div class="swap-new">Keep exactly as is — one plate</div></div>
+      <div class="swap-row"><div class="swap-old">Sweets, when craved</div><div class="arrow">→</div><div class="swap-new">One small piece after a meal</div></div>
+      <div class="tag-row">
+        <span class="tag">Tea/coffee: step down over 2 weeks, don't cold-turkey</span>
+        <span class="tag">Veggies/salad first at every meal</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- WATER -->
+  <div class="panel" id="panel-water">
+    <div class="card">
+      <h3>Water tracker</h3><p class="sub">Goal: 8 glasses (~2L) a day. Add lemon or cucumber if plain water is hard to get down.</p>
+      <div class="water-hero">
+        <div class="water-count mono"><span id="waterNum">0</span>/8</div>
+        <div class="water-goal-lbl">glasses today</div>
+        <div class="glass-row" id="glassRow"></div>
+        <div class="water-btns">
+          <button class="btn" id="addGlass">+ Add a glass</button>
+          <button class="btn ghost" id="resetGlass">Reset today</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROGRESS -->
+  <div class="panel" id="panel-progress">
+    <div class="card">
+      <h3>Body fat estimate (no gadget needed)</h3>
+      <p class="sub">US Navy method — measure with a soft tape. Not lab-exact, but consistent enough to track trend month to month. Re-measure every 3–4 weeks.</p>
+      <div class="field-row">
+        <select id="bfGender"><option value="m">Male</option><option value="f">Female</option></select>
+        <input type="number" id="bfHeight" placeholder="Height (cm)">
+      </div>
+      <div class="field-row">
+        <input type="number" id="bfNeck" placeholder="Neck (cm)">
+        <input type="number" id="bfWaist" placeholder="Waist, at navel (cm)">
+        <input type="number" id="bfHip" placeholder="Hip (cm) — women only" style="display:none;">
+      </div>
+      <button class="btn amber small" id="bfCalc">Estimate body fat</button>
+      <div class="bf-result" id="bfResult"></div>
+    </div>
+
+    <div class="card">
+      <h3>Progress photos</h3>
+      <p class="sub">Same spot, same lighting, same rough pose each time — that's what makes the comparison actually mean something. These stay on this device only, never uploaded anywhere.</p>
+      <div class="field-row">
+        <input type="date" id="pDate">
+        <select id="pType"><option value="progress">Progress</option><option value="before">Before</option><option value="after">After</option></select>
+      </div>
+      <div class="field-row">
+        <input type="file" id="pFile" accept="image/*" capture="environment">
+      </div>
+      <button class="btn small teal" id="pSave">Save photo</button>
+      <div class="compare-row" id="compareRow" style="display:none;"></div>
+      <div class="photo-grid" id="photoGrid"></div>
+    </div>
+
+    <div class="card">
+      <h3>Log your weight</h3>
+      <p class="sub">Weigh in weekly, same day, same time — morning before food is most consistent. Daily swings are mostly water.</p>
+      <div class="field-row">
+        <input type="date" id="wDate">
+        <input type="number" id="wKg" placeholder="kg e.g. 101.4" step="0.1">
+        <input type="number" id="wFat" placeholder="body fat % (optional)" step="0.1">
+      </div>
+      <button class="btn small" id="addWeight">Save entry</button>
+      <svg id="chartSvg" width="100%" height="130" viewBox="0 0 680 130" preserveAspectRatio="none" style="margin-top:12px;"></svg>
+      <div class="log-list" id="logList"></div>
+      <div class="export-row">
+        <button class="btn ghost small" id="exportWeight">⬇ Export weight log (CSV)</button>
+        <button class="btn ghost small" id="exportHabits">⬇ Export habit log (CSV)</button>
+        <label class="btn ghost small" for="importFile" style="cursor:pointer;">⬆ Import weight CSV</label>
+        <input type="file" id="importFile" accept=".csv">
+      </div>
+    </div>
+  </div>
+
+  <!-- SOS -->
+  <div class="panel" id="panel-sos">
+    <div class="card">
+      <button class="sos-btn" id="sosBtn">⚡ Cramp right now — tap for steps</button>
+      <div class="sos-steps" id="sosSteps" style="display:none;">
+        <div class="sos-step"><div class="sos-num">1</div><div>Stop moving immediately. Don't push through it.</div></div>
+        <div class="sos-step"><div class="sos-num">2</div><div>Gently stretch the muscle and hold 20–30 seconds — for a calf cramp, straighten the leg and pull your toes toward you.</div></div>
+        <div class="sos-step"><div class="sos-num">3</div><div>Lightly massage the area while holding the stretch.</div></div>
+        <div class="sos-step"><div class="sos-num">4</div><div>Sip water — add a pinch of salt or eat a banana if nearby; cramps are often dehydration or electrolyte-related.</div></div>
+        <div class="sos-step"><div class="sos-num">5</div><div>Once it eases, walk slowly for a minute before deciding whether to continue lighter, or stop for today.</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Preventing the next one</h3>
+      <div class="tag-row">
+        <span class="tag">Warm up 3–4 min before every session</span>
+        <span class="tag">Drink water through the day, not just before exercise</span>
+        <span class="tag">Stretch calves & thighs after every session</span>
+        <span class="tag">Bananas, nuts, coconut water — natural electrolytes</span>
+        <span class="tag">Repeating cramps? Mention it at your checkup</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="foot-note">
+    Not medical advice — a checkup before increasing intensity is worth it given the cramps and heart rate.<br>
+    <b>Where your data lives:</b> saved in this browser's local storage. Export CSV regularly as backup — especially before clearing browser data or switching phones.<br>
+    <b>Progress photos</b> are stored on this device only (IndexedDB) and aren't included in the CSV backup — they're too large for that. If you switch phones or reinstall the browser, they won't carry over unless you screenshot/save them first.<br>
+    <b>To put this on Netlify:</b> go to app.netlify.com/drop and drag this HTML file onto the page — it goes live instantly, no build step needed.<br>
+    <b>To use your own exercise photos:</b> create a folder named <span class="mono">images</span> next to this file, and drop in JPGs named exactly: march-in-place.jpg, wall-pushups.jpg, sit-to-stand-squat.jpg, side-leg-raise.jpg, calf-raises.jpg, stretch-cooldown.jpg, goblet-squat.jpg, dumbbell-rdl.jpg, reverse-lunge.jpg, bent-over-row.jpg, farmer-carry.jpg, weighted-calf-raise.jpg — each card switches to your photo automatically, and falls back to the icon if a file is missing.
+  </div>
+</div>
+
+<script>
+const useCloud = (typeof window.storage !== 'undefined');
+async function sGet(key){
+  try{
+    if(useCloud){ const r = await window.storage.get(key); return r ? r.value : null; }
+    return localStorage.getItem(key);
+  }catch(e){ document.getElementById('banner').style.display='block'; return null; }
+}
+async function sSet(key,value){
+  try{
+    if(useCloud){ await window.storage.set(key,value); } else { localStorage.setItem(key,value); }
+  }catch(e){ document.getElementById('banner').style.display='block'; }
+}
+async function sList(prefix){
+  try{
+    if(useCloud){ const r = await window.storage.list(prefix); return r ? r.keys : []; }
+    const keys=[]; for(let i=0;i<localStorage.length;i++){ const k=localStorage.key(i); if(k && k.startsWith(prefix)) keys.push(k); } return keys;
+  }catch(e){ return []; }
+}
+
+function todayKey(){ return new Date().toISOString().slice(0,10); }
+const GOAL_KG = 92.0, START_KG = 102.0;
+document.getElementById('todayLabel').textContent = new Date().toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long'});
+
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('panel-'+btn.dataset.tab).classList.add('active');
+  });
+});
+
+const CHECK_ITEMS = [
+  {id:'water', label:'Hit your water goal', sub:'8 glasses logged in the Water tab'},
+  {id:'move', label:"Did today's routine", sub:'Move / Strength / Back Care — or a brisk walk'},
+  {id:'lunch', label:'Made one swap at lunch', sub:'Veggies first, less oil, smaller rice portion'},
+  {id:'snack', label:'Swapped the evening snack', sub:'Chana / fruit / egg instead of puff or cake'},
+  {id:'notea', label:'Kept tea/coffee to the step-down plan', sub:'Max 1 cup, or swapped for herbal/lemon water'},
+];
+let dailyLog = {checklist:{}, waterGlasses:0};
+
+async function loadToday(){
+  const raw = await sGet('daily-log:'+todayKey());
+  if(raw){ try{ dailyLog = JSON.parse(raw); }catch(e){} }
+  if(!dailyLog.checklist) dailyLog.checklist = {};
+  if(typeof dailyLog.waterGlasses !== 'number') dailyLog.waterGlasses = 0;
+  renderChecklist(); renderWater(); updateRing();
+}
+async function saveToday(){ await sSet('daily-log:'+todayKey(), JSON.stringify(dailyLog)); updateRing(); updateStreak(); }
+
+function renderChecklist(){
+  const c = document.getElementById('checklist'); c.innerHTML = '';
+  CHECK_ITEMS.forEach(item=>{
+    const row = document.createElement('div');
+    row.className = 'check-item' + (dailyLog.checklist[item.id] ? ' done' : '');
+    row.innerHTML = `<input type="checkbox" id="chk-${item.id}" ${dailyLog.checklist[item.id]?'checked':''}>
+      <label for="chk-${item.id}">${item.label}<b>${item.sub}</b></label>`;
+    c.appendChild(row);
+    row.querySelector('input').addEventListener('change',(e)=>{
+      dailyLog.checklist[item.id] = e.target.checked; row.classList.toggle('done', e.target.checked); saveToday();
+    });
+  });
+}
+function updateRing(){
+  const total = CHECK_ITEMS.length, done = CHECK_ITEMS.filter(i=>dailyLog.checklist[i.id]).length;
+  const pct = Math.round((done/total)*100), circ = 402;
+  document.getElementById('ringFg').style.strokeDashoffset = circ - (circ*pct/100);
+  document.getElementById('ringPct').textContent = pct+'%';
+}
+async function updateStreak(){
+  try{
+    const keys = await sList('daily-log:');
+    const dates = keys.map(k=>k.replace('daily-log:','')).sort().reverse();
+    let streak = 0, cursor = new Date();
+    for(let i=0;i<dates.length+1;i++){
+      const expected = cursor.toISOString().slice(0,10);
+      if(dates.includes(expected)){
+        const raw = await sGet('daily-log:'+expected);
+        let ok = false; try{ const d = JSON.parse(raw); ok = Object.values(d.checklist||{}).some(v=>v); }catch(e){}
+        if(ok){ streak++; cursor.setDate(cursor.getDate()-1); } else break;
+      } else break;
+    }
+    document.getElementById('streakPill').textContent = `🔥 ${streak} day streak`;
+  }catch(e){ document.getElementById('streakPill').textContent = '🔥 0 day streak'; }
+}
+
+function renderWater(){
+  document.getElementById('waterNum').textContent = dailyLog.waterGlasses;
+  const row = document.getElementById('glassRow'); row.innerHTML = '';
+  for(let i=0;i<8;i++){
+    const filled = i < dailyLog.waterGlasses;
+    const svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
+    svg.setAttribute('viewBox','0 0 34 44'); svg.setAttribute('class','glass');
+    svg.innerHTML = `<path d="M4 4 L30 4 L26 40 L8 40 Z" fill="${filled?'#c6f135':'rgba(255,255,255,0.06)'}" stroke="${filled?'#c6f135':'rgba(255,255,255,0.25)'}" stroke-width="2"/>`;
+    row.appendChild(svg);
+  }
+}
+document.getElementById('addGlass').addEventListener('click',()=>{ if(dailyLog.waterGlasses<12) dailyLog.waterGlasses++; renderWater(); saveToday(); });
+document.getElementById('resetGlass').addEventListener('click',()=>{ dailyLog.waterGlasses=0; renderWater(); saveToday(); });
+
+let weightLog = [];
+async function loadWeights(){
+  const raw = await sGet('weight-log');
+  if(raw){ try{ weightLog = JSON.parse(raw); }catch(e){ weightLog=[]; } }
+  renderWeights();
+}
+async function saveWeights(){ await sSet('weight-log', JSON.stringify(weightLog)); renderWeights(); }
+function renderWeights(){
+  const sorted = [...weightLog].sort((a,b)=>a.date.localeCompare(b.date));
+  const list = document.getElementById('logList'); list.innerHTML = '';
+  [...sorted].reverse().forEach(e=>{
+    const row = document.createElement('div'); row.className='log-row';
+    row.innerHTML = `<span>${e.date}${e.fat?(' · fat '+e.fat+'%'):''}</span><b>${e.kg} kg</b>`;
+    list.appendChild(row);
+  });
+  const latest = sorted.length ? sorted[sorted.length-1].kg : START_KG;
+  document.getElementById('statCurrent').textContent = latest.toFixed(1);
+  document.getElementById('statToGo').textContent = Math.max(0, latest-GOAL_KG).toFixed(1);
+  document.getElementById('statGoal').textContent = GOAL_KG.toFixed(1);
+
+  const svg = document.getElementById('chartSvg'); svg.innerHTML='';
+  const pts = sorted.length ? sorted : [{date:todayKey(),kg:START_KG}];
+  const maxKg = Math.max(START_KG,...pts.map(p=>p.kg))+1, minKg = Math.min(GOAL_KG,...pts.map(p=>p.kg))-1;
+  const w=680,h=130,pad=20;
+  const xStep = pts.length>1 ? (w-2*pad)/(pts.length-1) : 0;
+  const yFor = kg => h-pad - ((kg-minKg)/(maxKg-minKg))*(h-2*pad);
+  const goalY = yFor(GOAL_KG);
+  const gLine = document.createElementNS('http://www.w3.org/2000/svg','line');
+  gLine.setAttribute('x1',pad); gLine.setAttribute('x2',w-pad); gLine.setAttribute('y1',goalY); gLine.setAttribute('y2',goalY);
+  gLine.setAttribute('stroke','#ff9e40'); gLine.setAttribute('stroke-dasharray','4 4'); gLine.setAttribute('stroke-width','1.5');
+  svg.appendChild(gLine);
+  let d=''; pts.forEach((p,i)=>{ const x=pad+i*xStep, y=yFor(p.kg); d += (i===0?'M':'L')+x+' '+y+' '; });
+  const path = document.createElementNS('http://www.w3.org/2000/svg','path');
+  path.setAttribute('d',d.trim()); path.setAttribute('fill','none'); path.setAttribute('stroke','#c6f135');
+  path.setAttribute('stroke-width','2.5'); path.setAttribute('stroke-linecap','round'); path.setAttribute('stroke-linejoin','round');
+  svg.appendChild(path);
+  pts.forEach((p,i)=>{ const x=pad+i*xStep, y=yFor(p.kg);
+    const c = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    c.setAttribute('cx',x); c.setAttribute('cy',y); c.setAttribute('r','3.5'); c.setAttribute('fill','#c6f135');
+    svg.appendChild(c);
+  });
+}
+document.getElementById('addWeight').addEventListener('click',()=>{
+  const date = document.getElementById('wDate').value || todayKey();
+  const kg = parseFloat(document.getElementById('wKg').value);
+  const fat = parseFloat(document.getElementById('wFat').value);
+  if(!kg || isNaN(kg)) return;
+  weightLog = weightLog.filter(e=>e.date!==date);
+  weightLog.push({date, kg, fat: isNaN(fat)?null:fat});
+  saveWeights();
+  document.getElementById('wKg').value=''; document.getElementById('wFat').value='';
+});
+document.getElementById('wDate').value = todayKey();
+
+// body fat calculator
+document.getElementById('bfGender').addEventListener('change',(e)=>{
+  document.getElementById('bfHip').style.display = e.target.value==='f' ? 'block':'none';
+});
+document.getElementById('bfCalc').addEventListener('click',()=>{
+  const gender = document.getElementById('bfGender').value;
+  const height = parseFloat(document.getElementById('bfHeight').value);
+  const neck = parseFloat(document.getElementById('bfNeck').value);
+  const waist = parseFloat(document.getElementById('bfWaist').value);
+  const hip = parseFloat(document.getElementById('bfHip').value);
+  const box = document.getElementById('bfResult');
+  if(!height || !neck || !waist || (gender==='f' && !hip)){
+    box.style.display='block'; box.innerHTML = 'Fill in all the measurements above (in cm) to get an estimate.'; return;
+  }
+  let bf;
+  if(gender==='m'){
+    bf = 495/(1.0324 - 0.19077*Math.log10(waist-neck) + 0.15456*Math.log10(height)) - 450;
+  } else {
+    bf = 495/(1.29579 - 0.35004*Math.log10(waist+hip-neck) + 0.22100*Math.log10(height)) - 450;
+  }
+  bf = Math.max(3, Math.min(60, bf));
+  box.style.display='block';
+  box.innerHTML = `Estimated body fat: <b>${bf.toFixed(1)}%</b><br><span style="color:var(--ink-dim);font-size:11.5px;">±3–4% margin — use it to track trend, not as an exact number. Re-measure in 3–4 weeks.</span>
+    <br><button class="btn small teal" id="useThisFat" style="margin-top:8px;">Use for today's weight entry</button>`;
+  document.getElementById('useThisFat').addEventListener('click',()=>{ document.getElementById('wFat').value = bf.toFixed(1); });
+});
+
+// CSV export/import
+function toCSV(rows, headers){
+  const esc = v => `"${String(v??'').replace(/"/g,'""')}"`;
+  return headers.join(',')+'\n'+rows.map(r=>headers.map(h=>esc(r[h])).join(',')).join('\n');
+}
+function downloadCSV(filename, csvString){
+  const blob = new Blob([csvString],{type:'text/csv'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href=url; a.download=filename;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+}
+async function markBackedUp(){ await sSet('last-export-date', todayKey()); document.getElementById('backupBanner').style.display='none'; }
+async function checkBackupReminder(){
+  const last = await sGet('last-export-date');
+  const first = await sGet('first-open-date');
+  if(!first){ await sSet('first-open-date', todayKey()); return; }
+  const refDate = last || first;
+  const days = Math.floor((new Date(todayKey()) - new Date(refDate)) / 86400000);
+  if(days >= 7) document.getElementById('backupBanner').style.display = 'block';
+}
+document.getElementById('exportWeight').addEventListener('click',()=>{
+  const sorted = [...weightLog].sort((a,b)=>a.date.localeCompare(b.date));
+  downloadCSV('weight-log.csv', toCSV(sorted, ['date','kg','fat']));
+  markBackedUp();
+});
+document.getElementById('exportHabits').addEventListener('click', async ()=>{
+  const keys = await sList('daily-log:');
+  const rows = [];
+  for(const k of keys.sort()){
+    const raw = await sGet(k);
+    try{
+      const d = JSON.parse(raw);
+      rows.push({
+        date: k.replace('daily-log:',''),
+        water_glasses: d.waterGlasses||0,
+        water_goal_met: (d.waterGlasses||0)>=8,
+        routine_done: !!(d.checklist&&d.checklist.move),
+        lunch_swap: !!(d.checklist&&d.checklist.lunch),
+        snack_swap: !!(d.checklist&&d.checklist.snack),
+        tea_plan_kept: !!(d.checklist&&d.checklist.notea)
+      });
+    }catch(e){}
+  }
+  downloadCSV('habit-log.csv', toCSV(rows, ['date','water_glasses','water_goal_met','routine_done','lunch_swap','snack_swap','tea_plan_kept']));
+  markBackedUp();
+});
+document.getElementById('importFile').addEventListener('change',(e)=>{
+  const file = e.target.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev)=>{
+    const lines = ev.target.result.split('\n').map(l=>l.trim()).filter(Boolean);
+    const headers = lines[0].split(',').map(h=>h.replace(/"/g,''));
+    for(let i=1;i<lines.length;i++){
+      const cells = lines[i].split(',').map(c=>c.replace(/"/g,''));
+      const row = {}; headers.forEach((h,idx)=>row[h]=cells[idx]);
+      if(row.date && row.kg){
+        weightLog = weightLog.filter(x=>x.date!==row.date);
+        weightLog.push({date:row.date, kg:parseFloat(row.kg), fat: row.fat?parseFloat(row.fat):null});
+      }
+    }
+    saveWeights();
+  };
+  reader.readAsText(file);
+});
+
+document.getElementById('sosBtn').addEventListener('click',()=>{
+  const el = document.getElementById('sosSteps'); el.style.display = el.style.display==='none' ? 'block' : 'none';
+});
+
+// progress photos — stored in IndexedDB (handles images far better than localStorage)
+let photoDB;
+function openPhotoDB(){
+  return new Promise((resolve,reject)=>{
+    if(!window.indexedDB){ reject('no indexeddb'); return; }
+    const req = indexedDB.open('fitnessResetDB', 1);
+    req.onupgradeneeded = (e)=>{
+      const d = e.target.result;
+      if(!d.objectStoreNames.contains('photos')){
+        const store = d.createObjectStore('photos', {keyPath:'id', autoIncrement:true});
+        store.createIndex('date','date',{unique:false});
+      }
+    };
+    req.onsuccess = (e)=>resolve(e.target.result);
+    req.onerror = (e)=>reject(e);
+  });
+}
+function resizeImage(file, maxW){
+  maxW = maxW || 900;
+  return new Promise((resolve)=>{
+    const reader = new FileReader();
+    reader.onload = (e)=>{
+      const img = new Image();
+      img.onload = ()=>{
+        const scale = Math.min(1, maxW/img.width);
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.round(img.width*scale); canvas.height = Math.round(img.height*scale);
+        canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);
+        resolve(canvas.toDataURL('image/jpeg', 0.82));
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+async function savePhoto(){
+  const fileInput = document.getElementById('pFile');
+  const file = fileInput.files[0];
+  if(!file) return;
+  const date = document.getElementById('pDate').value || todayKey();
+  const type = document.getElementById('pType').value;
+  try{
+    const dataUrl = await resizeImage(file);
+    const d = photoDB || (photoDB = await openPhotoDB());
+    const tx = d.transaction('photos','readwrite');
+    tx.objectStore('photos').add({date, type, dataUrl});
+    tx.oncomplete = ()=>{ fileInput.value=''; renderPhotos(); };
+  }catch(e){ alert('Could not save photo on this browser. Try a smaller image or a different browser.'); }
+}
+async function getAllPhotos(){
+  try{
+    const d = photoDB || (photoDB = await openPhotoDB());
+    return new Promise((resolve)=>{
+      const tx = d.transaction('photos','readonly');
+      const req = tx.objectStore('photos').getAll();
+      req.onsuccess = ()=>resolve((req.result||[]).sort((a,b)=>a.date.localeCompare(b.date)));
+      req.onerror = ()=>resolve([]);
+    });
+  }catch(e){ return []; }
+}
+async function deletePhoto(id){
+  const d = photoDB || (photoDB = await openPhotoDB());
+  const tx = d.transaction('photos','readwrite');
+  tx.objectStore('photos').delete(id);
+  tx.oncomplete = ()=>renderPhotos();
+}
+async function renderPhotos(){
+  const photos = await getAllPhotos();
+  const grid = document.getElementById('photoGrid');
+  grid.innerHTML = '';
+  [...photos].reverse().forEach(p=>{
+    const div = document.createElement('div'); div.className='photo-thumb';
+    div.innerHTML = `<img src="${p.dataUrl}"><span class="ptype">${p.type}</span><button class="pdel" data-id="${p.id}">×</button><div class="pdate">${p.date}</div>`;
+    grid.appendChild(div);
+  });
+  grid.querySelectorAll('.pdel').forEach(btn=>{
+    btn.addEventListener('click',()=>{ if(confirm('Delete this photo?')) deletePhoto(parseInt(btn.dataset.id)); });
+  });
+  const compareRow = document.getElementById('compareRow');
+  if(photos.length>=2){
+    const first = photos[0], last = photos[photos.length-1];
+    compareRow.style.display='flex';
+    compareRow.innerHTML = `<div class="compare-col"><img src="${first.dataUrl}"><span>First — ${first.date}</span></div>
+      <div class="compare-col"><img src="${last.dataUrl}"><span>Latest — ${last.date}</span></div>`;
+  } else { compareRow.style.display='none'; }
+}
+document.getElementById('pDate').value = todayKey();
+document.getElementById('pSave').addEventListener('click', savePhoto);
+renderPhotos();
+
+(async function init(){ await loadToday(); await loadWeights(); await updateStreak(); await checkBackupReminder(); })();
+</script>
+</body>
+</html>
